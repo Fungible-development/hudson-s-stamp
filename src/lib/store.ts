@@ -128,7 +128,7 @@ export const useStore = create<State & Actions>()(
           ),
         })),
     }),
-    { name: "hudsons-compliance-v1" },
+    { name: "hudsons-compliance-v1", skipHydration: true },
   ),
 );
 
