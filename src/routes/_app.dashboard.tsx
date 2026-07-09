@@ -1,5 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { AlertTriangle, CheckCircle2, ClipboardList, MapPinOff } from "lucide-react";
+import { ClientDate } from "@/components/client-date";
 import {
   findItemLabel,
   selectCompletedToday,
@@ -41,12 +42,7 @@ function Dashboard() {
       <div className="mb-6 flex items-end justify-between gap-4">
         <div className="min-w-0">
           <p className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
-            {new Date().toLocaleDateString(undefined, {
-              weekday: "long",
-              day: "2-digit",
-              month: "short",
-              year: "numeric",
-            })}
+            <ClientDate mode="today-long" fallback="—" />
           </p>
           <h1 className="font-display truncate text-3xl font-bold uppercase tracking-wide">
             Today&apos;s deck
@@ -113,7 +109,7 @@ function Dashboard() {
                     </p>
                     <p className="font-mono mt-0.5 truncate text-[11px] uppercase tracking-wider text-muted-foreground">
                       {tplName(f.templateId)} · {locName(f.locationId)} ·{" "}
-                      {new Date(f.submittedAt).toLocaleString()}
+                      <ClientDate value={f.submittedAt} />
                     </p>
                     {f.note && <p className="mt-1 text-sm text-muted-foreground">“{f.note}”</p>}
                   </div>
