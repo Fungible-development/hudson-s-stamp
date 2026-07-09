@@ -6,7 +6,9 @@ export const seedLocations: Location[] = [
   { id: "loc-vawaterfront", name: "V&A Waterfront", lat: -33.9036, lng: 18.4207, radiusM: 200 },
 ];
 
-const now = () => new Date().toISOString();
+// Fixed timestamps so SSR and client-persisted state match.
+const CREATED = "2026-06-01T08:00:00.000Z";
+const now = () => CREATED;
 
 export const seedTemplates: Template[] = [
   {
@@ -91,8 +93,9 @@ export const seedTemplates: Template[] = [
   },
 ];
 
-const yesterday = new Date(Date.now() - 24 * 3600 * 1000).toISOString();
-const twoDaysAgo = new Date(Date.now() - 2 * 24 * 3600 * 1000).toISOString();
+// Stable seed timestamps (relative to "today" is nice, but stability wins for SSR).
+const yesterday = "2026-07-08T14:30:00.000Z";
+const twoDaysAgo = "2026-07-07T09:14:00.000Z";
 
 export const seedAudits: Audit[] = [
   {
