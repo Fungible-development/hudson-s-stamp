@@ -2,6 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
 import { MapPinOff, Play } from "lucide-react";
 import { useStore, useVisibleAudits, useVisibleTemplates } from "@/lib/store";
+import { ClientDate } from "@/components/client-date";
 
 export const Route = createFileRoute("/_app/audits/")({
   head: () => ({
@@ -114,7 +115,7 @@ function AuditsIndex() {
                     <p className="truncate font-medium">{tplName(a.templateId)}</p>
                     <p className="font-mono mt-0.5 truncate text-[11px] uppercase tracking-wider text-muted-foreground">
                       {a.id} · {locName(a.locationId)} ·{" "}
-                      {a.submittedAt ? new Date(a.submittedAt).toLocaleString() : "in progress"}
+                      {a.submittedAt ? <ClientDate value={a.submittedAt} /> : "in progress"}
                     </p>
                   </div>
                   <div className="flex shrink-0 items-center gap-2">
