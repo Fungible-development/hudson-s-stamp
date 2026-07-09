@@ -14,6 +14,8 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as AppManagerRouteImport } from './routes/_app.manager'
 import { Route as AppDashboardRouteImport } from './routes/_app.dashboard'
 import { Route as AppTemplatesIndexRouteImport } from './routes/_app.templates.index'
+import { Route as AppTemplatesNewRouteImport } from './routes/_app.templates.new'
+import { Route as AppTemplatesIdRouteImport } from './routes/_app.templates.$id'
 
 const AppRoute = AppRouteImport.update({
   id: '/_app',
@@ -39,17 +41,31 @@ const AppTemplatesIndexRoute = AppTemplatesIndexRouteImport.update({
   path: '/templates/',
   getParentRoute: () => AppRoute,
 } as any)
+const AppTemplatesNewRoute = AppTemplatesNewRouteImport.update({
+  id: '/templates/new',
+  path: '/templates/new',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppTemplatesIdRoute = AppTemplatesIdRouteImport.update({
+  id: '/templates/$id',
+  path: '/templates/$id',
+  getParentRoute: () => AppRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/dashboard': typeof AppDashboardRoute
   '/manager': typeof AppManagerRoute
+  '/templates/$id': typeof AppTemplatesIdRoute
+  '/templates/new': typeof AppTemplatesNewRoute
   '/templates/': typeof AppTemplatesIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/dashboard': typeof AppDashboardRoute
   '/manager': typeof AppManagerRoute
+  '/templates/$id': typeof AppTemplatesIdRoute
+  '/templates/new': typeof AppTemplatesNewRoute
   '/templates': typeof AppTemplatesIndexRoute
 }
 export interface FileRoutesById {
@@ -58,19 +74,35 @@ export interface FileRoutesById {
   '/_app': typeof AppRouteWithChildren
   '/_app/dashboard': typeof AppDashboardRoute
   '/_app/manager': typeof AppManagerRoute
+  '/_app/templates/$id': typeof AppTemplatesIdRoute
+  '/_app/templates/new': typeof AppTemplatesNewRoute
   '/_app/templates/': typeof AppTemplatesIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/dashboard' | '/manager' | '/templates/'
+  fullPaths:
+    | '/'
+    | '/dashboard'
+    | '/manager'
+    | '/templates/$id'
+    | '/templates/new'
+    | '/templates/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/dashboard' | '/manager' | '/templates'
+  to:
+    | '/'
+    | '/dashboard'
+    | '/manager'
+    | '/templates/$id'
+    | '/templates/new'
+    | '/templates'
   id:
     | '__root__'
     | '/'
     | '/_app'
     | '/_app/dashboard'
     | '/_app/manager'
+    | '/_app/templates/$id'
+    | '/_app/templates/new'
     | '/_app/templates/'
   fileRoutesById: FileRoutesById
 }
@@ -116,18 +148,36 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppTemplatesIndexRouteImport
       parentRoute: typeof AppRoute
     }
+    '/_app/templates/new': {
+      id: '/_app/templates/new'
+      path: '/templates/new'
+      fullPath: '/templates/new'
+      preLoaderRoute: typeof AppTemplatesNewRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/templates/$id': {
+      id: '/_app/templates/$id'
+      path: '/templates/$id'
+      fullPath: '/templates/$id'
+      preLoaderRoute: typeof AppTemplatesIdRouteImport
+      parentRoute: typeof AppRoute
+    }
   }
 }
 
 interface AppRouteChildren {
   AppDashboardRoute: typeof AppDashboardRoute
   AppManagerRoute: typeof AppManagerRoute
+  AppTemplatesIdRoute: typeof AppTemplatesIdRoute
+  AppTemplatesNewRoute: typeof AppTemplatesNewRoute
   AppTemplatesIndexRoute: typeof AppTemplatesIndexRoute
 }
 
 const AppRouteChildren: AppRouteChildren = {
   AppDashboardRoute: AppDashboardRoute,
   AppManagerRoute: AppManagerRoute,
+  AppTemplatesIdRoute: AppTemplatesIdRoute,
+  AppTemplatesNewRoute: AppTemplatesNewRoute,
   AppTemplatesIndexRoute: AppTemplatesIndexRoute,
 }
 
