@@ -2,6 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { CheckCircle2, MapPinOff, MinusCircle, XCircle } from "lucide-react";
 import type { ResponseStatus } from "@/lib/mock/types";
 import { useStore } from "@/lib/store";
+import { ClientDate } from "@/components/client-date";
 
 export const Route = createFileRoute("/_app/audits/$id")({
   head: () => ({ meta: [{ title: "Audit record — Hudson's Compliance" }] }),
@@ -42,7 +43,7 @@ function AuditDetail() {
       </h1>
       <p className="font-mono mt-1 text-[11px] uppercase tracking-widest text-muted-foreground">
         {location?.name ?? audit.locationId} ·{" "}
-        {audit.submittedAt ? new Date(audit.submittedAt).toLocaleString() : "in progress"}
+        {audit.submittedAt ? <ClientDate value={audit.submittedAt} /> : "in progress"}
       </p>
 
       {audit.offSite && (
