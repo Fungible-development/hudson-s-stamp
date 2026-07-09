@@ -1,4 +1,5 @@
 import { createFileRoute, Link, Outlet, useRouterState } from "@tanstack/react-router";
+import { useEffect, useState } from "react";
 import { ClipboardCheck, LayoutDashboard, FileText, MapPin } from "lucide-react";
 import { useActiveRole, useStore } from "@/lib/store";
 
@@ -19,6 +20,11 @@ function AppLayout() {
   const role = useActiveRole();
   const nav = role === "admin" ? adminNav : managerNav;
   const pathname = useRouterState({ select: (s) => s.location.pathname });
+  const [hydrated, setHydrated] = useState(false);
+  useEffect(() => {
+    void useStore.persist.rehydrate();
+    setHydrated(true);
+  }, []);
 
   return (
     <div className="min-h-screen w-full bg-background text-foreground">
@@ -48,7 +54,7 @@ function AppLayout() {
         </aside>
 
         <main className="min-w-0 flex-1 pb-24 md:pb-8">
-          <Outlet />
+          {hydrated ? <Outlet /> : null}
         </main>
       </div>
 
