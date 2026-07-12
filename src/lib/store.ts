@@ -3,13 +3,12 @@ import { persist } from "zustand/middleware";
 import type {
   Audit,
   AuditResponse,
-  AppSettings,
   Location,
   OffSiteReason,
   Role,
   Template,
 } from "./mock/types";
-import { defaultSettings, seedAudits, seedLocations, seedTemplates } from "./mock/seed";
+import { seedAudits, seedLocations, seedTemplates } from "./mock/seed";
 
 const uid = (prefix: string) =>
   `${prefix}-${Math.random().toString(36).slice(2, 8)}${Date.now().toString(36).slice(-3)}`;
@@ -21,7 +20,6 @@ type State = {
   locations: Location[];
   templates: Template[];
   audits: Audit[];
-  settings: AppSettings;
 };
 
 type Actions = {
@@ -31,8 +29,6 @@ type Actions = {
   createLocation: (input: { name: string; address: string }) => string;
   updateLocation: (id: string, patch: Partial<Pick<Location, "name" | "address">>) => void;
   deleteLocation: (id: string) => void;
-
-  updateSettings: (patch: Partial<AppSettings>) => void;
 
   createTemplate: (t: Omit<Template, "id" | "createdAt" | "updatedAt">) => string;
   updateTemplate: (id: string, patch: Partial<Template>) => void;
@@ -58,7 +54,6 @@ export const useStore = create<State & Actions>()(
       locations: seedLocations,
       templates: seedTemplates,
       audits: seedAudits,
-      settings: defaultSettings,
 
       setDevRole: (devRole) => set({ devRole }),
       setActiveLocation: (id) => set({ activeLocationId: id }),
@@ -87,9 +82,6 @@ export const useStore = create<State & Actions>()(
           ),
           activeLocationId: s.activeLocationId === id ? "all" : s.activeLocationId,
         })),
-
-      updateSettings: (patch) =>
-        set((s) => ({ settings: { ...s.settings, ...patch } })),
 
       createTemplate: (t) => {
         const id = uid("tpl");
@@ -173,7 +165,6 @@ export const useStore = create<State & Actions>()(
         return {
           ...current,
           ...p,
-          settings: { ...current.settings, ...(p.settings ?? {}) },
           locations: (p.locations ?? current.locations).map((l) => ({
             ...l,
             address: l.address ?? "",
