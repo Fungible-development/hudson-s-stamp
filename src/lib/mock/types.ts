@@ -1,4 +1,4 @@
-export type Schedule = "daily" | "weekly" | "monthly";
+export type Schedule = "daily" | "weekly" | "monthly" | "as_needed";
 
 export type Location = {
   id: string;
