@@ -53,11 +53,3 @@ export type Audit = {
 };
 
 export type Role = "admin" | "manager";
-
-export type DateFormat = "uk" | "us";
-
-export type AppSettings = {
-  groupName: string;
-  brandMark: string;
-  dateFormat: DateFormat;
-};

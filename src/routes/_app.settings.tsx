@@ -1,14 +1,14 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import { MapPin, Pencil, Plus, Trash2, X } from "lucide-react";
 import { useStore } from "@/lib/store";
-import type { DateFormat, Location } from "@/lib/mock/types";
+import type { Location } from "@/lib/mock/types";
 
 export const Route = createFileRoute("/_app/settings")({
   head: () => ({
     meta: [
       { title: "Settings — Hudson's Compliance" },
-      { name: "description", content: "Manage restaurant locations and display preferences." },
+      { name: "description", content: "Manage restaurant locations." },
     ],
   }),
   component: SettingsPage,
@@ -25,7 +25,6 @@ function SettingsPage() {
       </div>
 
       <LocationsSection />
-      <BrandSection />
     </div>
   );
 }
@@ -201,117 +200,5 @@ function LocationForm({
         </button>
       </div>
     </div>
-  );
-}
-
-// ---------------- Brand & display ----------------
-
-function BrandSection() {
-  const settings = useStore((s) => s.settings);
-  const updateSettings = useStore((s) => s.updateSettings);
-
-  const [groupName, setGroupName] = useState(settings.groupName);
-  const [brandMark, setBrandMark] = useState(settings.brandMark);
-  const [dateFormat, setDateFormat] = useState<DateFormat>(settings.dateFormat);
-  const [saved, setSaved] = useState(false);
-
-  const dirty = useMemo(
-    () =>
-      groupName !== settings.groupName ||
-      brandMark !== settings.brandMark ||
-      dateFormat !== settings.dateFormat,
-    [groupName, brandMark, dateFormat, settings],
-  );
-
-  const save = () => {
-    updateSettings({
-      groupName: groupName.trim() || "Hudson's Compliance",
-      brandMark: (brandMark.trim().slice(0, 1) || "H").toUpperCase(),
-      dateFormat,
-    });
-    setSaved(true);
-    setTimeout(() => setSaved(false), 1600);
-  };
-
-  return (
-    <section className="rounded-lg border border-border bg-card">
-      <header className="border-b border-border px-4 py-3.5">
-        <h2 className="font-display text-lg font-semibold text-foreground">Brand &amp; display</h2>
-        <p className="text-[13px] text-muted-foreground">
-          Group name, brand mark and how dates are shown across the app.
-        </p>
-      </header>
-
-      <div className="space-y-4 p-4">
-        <div className="grid gap-3 sm:grid-cols-[1fr_auto]">
-          <div>
-            <label className="font-mono block text-[10px] uppercase tracking-widest text-muted-foreground">
-              Group name
-            </label>
-            <input
-              value={groupName}
-              onChange={(e) => setGroupName(e.target.value)}
-              className="mt-1 w-full rounded-sm border border-border bg-background px-3 py-2 text-sm text-foreground outline-none focus:border-ink"
-            />
-          </div>
-          <div>
-            <label className="font-mono block text-[10px] uppercase tracking-widest text-muted-foreground">
-              Brand mark
-            </label>
-            <input
-              value={brandMark}
-              onChange={(e) => setBrandMark(e.target.value.slice(0, 1).toUpperCase())}
-              maxLength={1}
-              className="mt-1 w-16 rounded-sm border border-border bg-background px-3 py-2 text-center font-display text-lg font-bold uppercase text-foreground outline-none focus:border-ink"
-            />
-          </div>
-        </div>
-
-        <div>
-          <span className="font-mono block text-[10px] uppercase tracking-widest text-muted-foreground">
-            Date format
-          </span>
-          <div className="mt-2 flex gap-2">
-            {(
-              [
-                { id: "uk", label: "UK", example: "31/12/2026" },
-                { id: "us", label: "US", example: "12/31/2026" },
-              ] as const
-            ).map((opt) => (
-              <button
-                key={opt.id}
-                type="button"
-                onClick={() => setDateFormat(opt.id)}
-                className={`flex-1 rounded-sm border px-3 py-2 text-left text-sm transition-colors ${
-                  dateFormat === opt.id
-                    ? "border-ink bg-muted"
-                    : "border-border bg-background hover:bg-muted/40"
-                }`}
-              >
-                <span className="font-display block text-xs font-bold uppercase tracking-widest">
-                  {opt.label}
-                </span>
-                <span className="text-[13px] text-muted-foreground">{opt.example}</span>
-              </button>
-            ))}
-          </div>
-        </div>
-
-        <div className="flex items-center justify-end gap-3">
-          {saved && (
-            <span className="font-mono text-[10px] uppercase tracking-widest text-pass">
-              Saved
-            </span>
-          )}
-          <button
-            disabled={!dirty}
-            onClick={save}
-            className="font-display rounded-sm bg-ink px-4 py-2 text-xs font-bold uppercase tracking-widest text-paper disabled:opacity-40"
-          >
-            Save changes
-          </button>
-        </div>
-      </div>
-    </section>
   );
 }
