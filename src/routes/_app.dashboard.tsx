@@ -74,7 +74,7 @@ function Dashboard() {
                     {f.note && <p className="mt-1 text-sm text-muted-foreground">"{f.note}"</p>}
                   </div>
                   <Link
-                    to="/audits/$id"
+                    to="/audits/record/$id"
                     params={{ id: f.auditId }}
                     className="shrink-0 self-center text-[13px] text-muted-foreground hover:text-foreground"
                   >
@@ -104,7 +104,7 @@ function Dashboard() {
                     <p className="truncate text-[13px] text-muted-foreground">{locName(d.locationId)}</p>
                   </div>
                   <Link
-                    to="/audits/run/$id"
+                    to="/audits/$id/run"
                     params={{ id: d.templateId }}
                     search={{ location: d.locationId }}
                     className="shrink-0 rounded-lg bg-ink px-3.5 py-2 text-[13px] font-medium text-paper"
