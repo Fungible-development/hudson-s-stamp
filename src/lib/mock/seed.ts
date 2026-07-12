@@ -2,7 +2,7 @@ import type { Audit, Location, Template } from "./types";
 
 export const seedLocations: Location[] = [
   { id: "loc-gardens", name: "Gardens", lat: -33.9308, lng: 18.4155, radiusM: 150 },
-  { id: "loc-campsbay", name: "Camps Bay", lat: -33.9500, lng: 18.3776, radiusM: 150 },
+  { id: "loc-campsbay", name: "Camps Bay", lat: -33.95, lng: 18.3776, radiusM: 150 },
   { id: "loc-vawaterfront", name: "V&A Waterfront", lat: -33.9036, lng: 18.4207, radiusM: 200 },
 ];
 
@@ -12,9 +12,9 @@ const now = () => CREATED;
 
 export const seedTemplates: Template[] = [
   {
-    id: "tpl-opening",
-    name: "Opening Compliance Check",
-    schedule: "daily",
+    id: "tpl-gm-monday",
+    name: "GM Monday Audit",
+    schedule: "weekly",
     locationIds: seedLocations.map((l) => l.id),
     createdAt: now(),
     updatedAt: now(),
@@ -41,7 +41,7 @@ export const seedTemplates: Template[] = [
   {
     id: "tpl-chef",
     name: "Chef Audit",
-    schedule: "weekly",
+    schedule: "monthly",
     locationIds: [seedLocations[0].id, seedLocations[1].id],
     createdAt: now(),
     updatedAt: now(),
@@ -74,19 +74,50 @@ export const seedTemplates: Template[] = [
     ],
   },
   {
-    id: "tpl-deep",
-    name: "Deep Clean",
+    id: "tpl-maintenance",
+    name: "Maintenance / Equipment Audit",
     schedule: "monthly",
-    locationIds: [seedLocations[2].id],
+    locationIds: seedLocations.map((l) => l.id),
     createdAt: now(),
     updatedAt: now(),
     sections: [
       {
-        id: "sec-hood",
+        id: "sec-extraction",
         name: "Extraction",
         items: [
           { id: "itm-hood", label: "Hood filters degreased", requiresNote: false },
           { id: "itm-ducts", label: "Ducts inspected", requiresNote: true },
+        ],
+      },
+      {
+        id: "sec-equipment",
+        name: "Equipment",
+        items: [
+          { id: "itm-fridge-seals", label: "Fridge door seals intact", requiresNote: false },
+          { id: "itm-service-tags", label: "Equipment service tags current", requiresNote: true },
+        ],
+      },
+    ],
+  },
+  {
+    id: "tpl-waitress-training",
+    name: "Waitress Training Audit",
+    schedule: "as_needed",
+    locationIds: seedLocations.map((l) => l.id),
+    createdAt: now(),
+    updatedAt: now(),
+    sections: [
+      {
+        id: "sec-service",
+        name: "Service Standards",
+        items: [
+          { id: "itm-greeting", label: "Guest greeted within 2 minutes", requiresNote: false },
+          {
+            id: "itm-menu-knowledge",
+            label: "Confident on menu and allergens",
+            requiresNote: true,
+          },
+          { id: "itm-upsell", label: "Comfortable suggesting add-ons", requiresNote: false },
         ],
       },
     ],
@@ -100,7 +131,7 @@ const twoDaysAgo = "2026-07-07T09:14:00.000Z";
 export const seedAudits: Audit[] = [
   {
     id: "aud-0001",
-    templateId: "tpl-opening",
+    templateId: "tpl-gm-monday",
     locationId: "loc-gardens",
     startedAt: yesterday,
     submittedAt: yesterday,
