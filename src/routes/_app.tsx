@@ -1,6 +1,6 @@
 import { createFileRoute, Link, Outlet, useRouterState } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { ClipboardCheck, LayoutDashboard, FileText, MapPin } from "lucide-react";
+import { ClipboardCheck, LayoutDashboard, MapPin } from "lucide-react";
 import { useActiveRole, useStore } from "@/lib/store";
 
 export const Route = createFileRoute("/_app")({
