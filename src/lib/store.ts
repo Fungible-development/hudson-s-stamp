@@ -3,12 +3,13 @@ import { persist } from "zustand/middleware";
 import type {
   Audit,
   AuditResponse,
+  AppSettings,
   Location,
   OffSiteReason,
   Role,
   Template,
 } from "./mock/types";
-import { seedAudits, seedLocations, seedTemplates } from "./mock/seed";
+import { defaultSettings, seedAudits, seedLocations, seedTemplates } from "./mock/seed";
 
 const uid = (prefix: string) =>
   `${prefix}-${Math.random().toString(36).slice(2, 8)}${Date.now().toString(36).slice(-3)}`;
@@ -20,11 +21,18 @@ type State = {
   locations: Location[];
   templates: Template[];
   audits: Audit[];
+  settings: AppSettings;
 };
 
 type Actions = {
   setDevRole: (r: Role | null) => void;
   setActiveLocation: (id: string | "all") => void;
+
+  createLocation: (input: { name: string; address: string }) => string;
+  updateLocation: (id: string, patch: Partial<Pick<Location, "name" | "address">>) => void;
+  deleteLocation: (id: string) => void;
+
+  updateSettings: (patch: Partial<AppSettings>) => void;
 
   createTemplate: (t: Omit<Template, "id" | "createdAt" | "updatedAt">) => string;
   updateTemplate: (id: string, patch: Partial<Template>) => void;
@@ -50,9 +58,38 @@ export const useStore = create<State & Actions>()(
       locations: seedLocations,
       templates: seedTemplates,
       audits: seedAudits,
+      settings: defaultSettings,
 
       setDevRole: (devRole) => set({ devRole }),
       setActiveLocation: (id) => set({ activeLocationId: id }),
+
+      createLocation: ({ name, address }) => {
+        const id = uid("loc");
+        set((s) => ({
+          locations: [
+            ...s.locations,
+            { id, name, address, lat: 0, lng: 0, radiusM: 150 },
+          ],
+        }));
+        return id;
+      },
+      updateLocation: (id, patch) =>
+        set((s) => ({
+          locations: s.locations.map((l) => (l.id === id ? { ...l, ...patch } : l)),
+        })),
+      deleteLocation: (id) =>
+        set((s) => ({
+          locations: s.locations.filter((l) => l.id !== id),
+          templates: s.templates.map((t) =>
+            t.locationIds.includes(id)
+              ? { ...t, locationIds: t.locationIds.filter((x) => x !== id) }
+              : t,
+          ),
+          activeLocationId: s.activeLocationId === id ? "all" : s.activeLocationId,
+        })),
+
+      updateSettings: (patch) =>
+        set((s) => ({ settings: { ...s.settings, ...patch } })),
 
       createTemplate: (t) => {
         const id = uid("tpl");
@@ -128,7 +165,22 @@ export const useStore = create<State & Actions>()(
           ),
         })),
     }),
-    { name: "hudsons-compliance-v2", skipHydration: true },
+    {
+      name: "hudsons-compliance-v2",
+      skipHydration: true,
+      merge: (persisted, current) => {
+        const p = (persisted ?? {}) as Partial<State>;
+        return {
+          ...current,
+          ...p,
+          settings: { ...current.settings, ...(p.settings ?? {}) },
+          locations: (p.locations ?? current.locations).map((l) => ({
+            ...l,
+            address: l.address ?? "",
+          })),
+        };
+      },
+    },
   ),
 );
 
