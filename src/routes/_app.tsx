@@ -1,6 +1,6 @@
 import { createFileRoute, Link, Outlet, useRouterState } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { ClipboardCheck, LayoutDashboard, FileText, MapPin } from "lucide-react";
+import { ClipboardCheck, LayoutDashboard, MapPin } from "lucide-react";
 import { useActiveRole, useStore } from "@/lib/store";
 
 export const Route = createFileRoute("/_app")({
@@ -11,7 +11,6 @@ type NavItem = { to: string; label: string; icon: typeof LayoutDashboard };
 
 const adminNav: NavItem[] = [
   { to: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
-  { to: "/templates", label: "Templates", icon: FileText },
   { to: "/audits", label: "Audits", icon: ClipboardCheck },
 ];
 const managerNav: NavItem[] = [{ to: "/manager", label: "Home", icon: LayoutDashboard }];

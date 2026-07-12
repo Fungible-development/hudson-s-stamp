@@ -61,6 +61,7 @@ export function TemplateEditor({
               <option value="daily">Daily</option>
               <option value="weekly">Weekly</option>
               <option value="monthly">Monthly</option>
+              <option value="as_needed">As needed</option>
             </select>
           </label>
 
