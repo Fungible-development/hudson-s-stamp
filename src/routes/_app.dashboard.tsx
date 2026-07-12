@@ -1,4 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { useState } from "react";
+import { MapPin } from "lucide-react";
 import { ClientDate } from "@/components/client-date";
 import {
   findItemLabel,
@@ -36,6 +38,10 @@ function Dashboard() {
   const locName = (id: string) => locations.find((l) => l.id === id)?.name ?? id;
   const tplName = (id: string) => allTemplates.find((t) => t.id === id)?.name ?? id;
 
+  const [flagLoc, setFlagLoc] = useState<string>("all");
+  const flaggedFiltered = flagLoc === "all" ? flagged : flagged.filter((f) => f.locationId === flagLoc);
+  const flagLocName = flagLoc === "all" ? null : locName(flagLoc);
+
   return (
     <div className="mx-auto w-full max-w-3xl px-4 py-6 sm:px-6 sm:py-8">
       <div className="mb-5">
@@ -53,17 +59,39 @@ function Dashboard() {
       </div>
 
       <section className="mt-7">
-        <p className="mb-2.5 text-[15px] font-medium text-foreground">Flagged items</p>
+        <div className="mb-2.5 flex items-center justify-between gap-3">
+          <p className="text-[15px] font-medium text-foreground">Flagged items</p>
+          <div className="relative">
+            <MapPin className="pointer-events-none absolute left-2 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-muted-foreground" />
+            <select
+              value={flagLoc}
+              onChange={(e) => setFlagLoc(e.target.value)}
+              className="appearance-none rounded-md border border-border bg-card py-1.5 pl-7 pr-7 text-[13px] text-foreground"
+              aria-label="Filter flagged items by location"
+            >
+              <option value="all">All locations</option>
+              {locations.map((l) => (
+                <option key={l.id} value={l.id}>
+                  {l.name}
+                </option>
+              ))}
+            </select>
+          </div>
+        </div>
         <div className="rounded-lg border border-border bg-card">
-          {flagged.length === 0 ? (
+          {flaggedFiltered.length === 0 ? (
             <EmptyState
-              title="No flagged items in the last 7 days."
+              title={
+                flagLocName
+                  ? `No flagged items at ${flagLocName} in the last 7 days.`
+                  : "No flagged items in the last 7 days."
+              }
               hint="Everything's stamped clean. Keep it that way."
               cta={{ to: "/audits", label: "Run an audit" }}
             />
           ) : (
             <ul className="divide-y divide-border">
-              {flagged.map((f) => (
+              {flaggedFiltered.map((f) => (
                 <li key={`${f.auditId}-${f.itemId}`} className="flex items-start gap-3 p-3.5">
                   <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-fail" />
                   <div className="min-w-0 flex-1">

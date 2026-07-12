@@ -1,64 +1,28 @@
-## Settings tab — plan
+## Goal
 
-### Access
-- Add a **gear icon** in the top bar (`src/routes/_app.tsx`), admin-only, next to the location switcher. Opens `/settings`.
-- No change to bottom tab bar / sidebar nav.
+Let the user narrow the Dashboard's **Flagged items** list to a single restaurant, independently of the top-bar location switcher.
 
-### Route
-- New file: `src/routes/_app.settings.tsx` (single page with two sections stacked; no sub-routes needed for v1).
+## Change
 
-### Section 1 — Locations
-Admin can manage the list of restaurants used everywhere (top-bar switcher, audit assignment, location picker on Start).
+In `src/routes/_app.dashboard.tsx`, add a compact selector in the "Flagged items" section header:
 
-Per location, editable fields:
-- **Display name** (e.g. "Hudson's Camden")
-- **Physical address** (single multi-line field)
+- Options: **All locations** + one entry per restaurant from `useStore(s => s.locations)`.
+- Local `useState` (default `"all"`). Does not touch the global `activeLocationId`, so tiles and "Due today" stay unaffected.
+- Applied on top of the already-filtered `flagged` list: when a location is picked, filter to `f.locationId === selected`.
+- Empty state copy updates to reflect the chosen location (e.g. "No flagged items at Camps Bay in the last 7 days.").
+- The flag count tile above continues to reflect the global filter — the new selector only scopes the list, matching the existing "honest counts" behaviour.
 
-Actions:
-- Add new location (name + address; new `id` generated).
-- Edit inline (row expands to form).
-- Delete (confirm dialog). Guard: if the location is referenced by any template's `locationIds` or by any audit, the delete confirm warns and, on confirm, also strips the id from those templates. Existing audit records keep the id (historical truth) and fall back to "Unknown location" in the UI.
+## Layout
 
-Data-model change (`src/lib/mock/types.ts`):
-- Add `address: string` to `Location`.
-- Keep existing `lat`, `lng`, `radiusM` (untouched by this UI, still used by soft GPS check against seed coordinates).
+```text
+Flagged items                        [ Location ▾ ]
+─────────────────────────────────────────────────
+• Menus torn — GM Monday · Gardens · 08/07/2026
+• Unlabelled sauce tubs — Chef · Camps Bay · 07/07/2026
+```
 
-Store (`src/lib/store.ts`):
-- Add `createLocation`, `updateLocation`, `deleteLocation` actions.
-- On delete, also purge the id from every template's `locationIds`.
-- Seed (`src/lib/mock/seed.ts`): add an `address` string to each existing seeded location.
+Selector uses the same styling as the top-bar location `<select>` (bordered, small, `MapPin` icon) but on a light surface to fit the card header.
 
-### Section 2 — Brand & display
-Small, focused settings that change what the whole app shows:
-- **Group name** — string shown in the top bar (currently hard-coded "Hudson's Compliance"). Default kept as today.
-- **Brand mark** — single letter for the square badge in the top bar (default "H").
-- **Date format** — radio: `UK (DD/MM/YYYY)` (default) or `US (MM/DD/YYYY)`. Wired into `src/components/client-date.tsx` so every rendered date respects it.
+## Out of scope
 
-Store additions:
-- `settings: { groupName: string; brandMark: string; dateFormat: "uk" | "us" }` with an `updateSettings(patch)` action. Persisted via the existing Zustand persist config (key stays `hudsons-compliance-v2` — new fields default in cleanly).
-
-### UI details
-- Page header: "Settings" in the display font, matching Dashboard/Audits.
-- Two card blocks: **Locations** (list + Add button) and **Brand & display** (form).
-- Save-on-blur for inline edits; explicit "Save" button on Brand & display.
-- Toast confirmations on create / update / delete (using existing sonner setup if present, else inline success flash).
-
-### Files touched
-- `src/routes/_app.tsx` — gear icon + admin-only link.
-- `src/routes/_app.settings.tsx` — new page.
-- `src/lib/mock/types.ts` — `address` on Location; `AppSettings` type.
-- `src/lib/mock/seed.ts` — addresses for seeded locations; default settings.
-- `src/lib/store.ts` — location CRUD, settings state + action, delete-cascade to templates.
-- `src/components/client-date.tsx` — honor `dateFormat` setting.
-- `src/routes/_app.tsx` (top bar) — use `settings.groupName` and `settings.brandMark`.
-
-### Out of scope (called out for clarity)
-- Editing GPS coordinates / geofence radius from the UI — the soft GPS check keeps using the seeded coordinates. Easy to add later once real venues are onboarded.
-- GPS strictness toggle, seed-reset button — you deferred these.
-
-### Other settings worth considering later (not building now)
-- **Team / users** — invite managers, assign them to locations (needs real auth).
-- **Notification rules** — who gets pinged when an audit is flagged or missed.
-- **Audit reminder times** — when "due today" starts nagging.
-- **Data export** — CSV of audits for a date range.
-- **Retention** — auto-archive audits older than N months.
+- No changes to the top-bar switcher, tiles, "Due today" section, or the underlying `selectRecentFlagged` selector.
