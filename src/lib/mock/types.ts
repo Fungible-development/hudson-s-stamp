@@ -3,6 +3,7 @@ export type Schedule = "daily" | "weekly" | "monthly" | "as_needed";
 export type Location = {
   id: string;
   name: string;
+  address: string;
   lat: number;
   lng: number;
   radiusM: number;
@@ -52,3 +53,11 @@ export type Audit = {
 };
 
 export type Role = "admin" | "manager";
+
+export type DateFormat = "uk" | "us";
+
+export type AppSettings = {
+  groupName: string;
+  brandMark: string;
+  dateFormat: DateFormat;
+};
