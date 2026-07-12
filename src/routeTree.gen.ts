@@ -15,6 +15,8 @@ import { Route as AppManagerRouteImport } from './routes/_app.manager'
 import { Route as AppDashboardRouteImport } from './routes/_app.dashboard'
 import { Route as AppAuditsIndexRouteImport } from './routes/_app.audits.index'
 import { Route as AppAuditsNewRouteImport } from './routes/_app.audits.new'
+import { Route as AppAuditsRecordIdRouteImport } from './routes/_app.audits.record.$id'
+import { Route as AppAuditsIdRunRouteImport } from './routes/_app.audits.$id.run'
 import { Route as AppAuditsIdEditRouteImport } from './routes/_app.audits.$id.edit'
 
 const AppRoute = AppRouteImport.update({
@@ -46,6 +48,16 @@ const AppAuditsNewRoute = AppAuditsNewRouteImport.update({
   path: '/audits/new',
   getParentRoute: () => AppRoute,
 } as any)
+const AppAuditsRecordIdRoute = AppAuditsRecordIdRouteImport.update({
+  id: '/audits/record/$id',
+  path: '/audits/record/$id',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppAuditsIdRunRoute = AppAuditsIdRunRouteImport.update({
+  id: '/audits/$id/run',
+  path: '/audits/$id/run',
+  getParentRoute: () => AppRoute,
+} as any)
 const AppAuditsIdEditRoute = AppAuditsIdEditRouteImport.update({
   id: '/audits/$id/edit',
   path: '/audits/$id/edit',
@@ -59,6 +71,8 @@ export interface FileRoutesByFullPath {
   '/audits/new': typeof AppAuditsNewRoute
   '/audits/': typeof AppAuditsIndexRoute
   '/audits/$id/edit': typeof AppAuditsIdEditRoute
+  '/audits/$id/run': typeof AppAuditsIdRunRoute
+  '/audits/record/$id': typeof AppAuditsRecordIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -67,6 +81,8 @@ export interface FileRoutesByTo {
   '/audits/new': typeof AppAuditsNewRoute
   '/audits': typeof AppAuditsIndexRoute
   '/audits/$id/edit': typeof AppAuditsIdEditRoute
+  '/audits/$id/run': typeof AppAuditsIdRunRoute
+  '/audits/record/$id': typeof AppAuditsRecordIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -77,6 +93,8 @@ export interface FileRoutesById {
   '/_app/audits/new': typeof AppAuditsNewRoute
   '/_app/audits/': typeof AppAuditsIndexRoute
   '/_app/audits/$id/edit': typeof AppAuditsIdEditRoute
+  '/_app/audits/$id/run': typeof AppAuditsIdRunRoute
+  '/_app/audits/record/$id': typeof AppAuditsRecordIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -87,6 +105,8 @@ export interface FileRouteTypes {
     | '/audits/new'
     | '/audits/'
     | '/audits/$id/edit'
+    | '/audits/$id/run'
+    | '/audits/record/$id'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -95,6 +115,8 @@ export interface FileRouteTypes {
     | '/audits/new'
     | '/audits'
     | '/audits/$id/edit'
+    | '/audits/$id/run'
+    | '/audits/record/$id'
   id:
     | '__root__'
     | '/'
@@ -104,6 +126,8 @@ export interface FileRouteTypes {
     | '/_app/audits/new'
     | '/_app/audits/'
     | '/_app/audits/$id/edit'
+    | '/_app/audits/$id/run'
+    | '/_app/audits/record/$id'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -155,6 +179,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppAuditsNewRouteImport
       parentRoute: typeof AppRoute
     }
+    '/_app/audits/record/$id': {
+      id: '/_app/audits/record/$id'
+      path: '/audits/record/$id'
+      fullPath: '/audits/record/$id'
+      preLoaderRoute: typeof AppAuditsRecordIdRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/audits/$id/run': {
+      id: '/_app/audits/$id/run'
+      path: '/audits/$id/run'
+      fullPath: '/audits/$id/run'
+      preLoaderRoute: typeof AppAuditsIdRunRouteImport
+      parentRoute: typeof AppRoute
+    }
     '/_app/audits/$id/edit': {
       id: '/_app/audits/$id/edit'
       path: '/audits/$id/edit'
@@ -171,6 +209,8 @@ interface AppRouteChildren {
   AppAuditsNewRoute: typeof AppAuditsNewRoute
   AppAuditsIndexRoute: typeof AppAuditsIndexRoute
   AppAuditsIdEditRoute: typeof AppAuditsIdEditRoute
+  AppAuditsIdRunRoute: typeof AppAuditsIdRunRoute
+  AppAuditsRecordIdRoute: typeof AppAuditsRecordIdRoute
 }
 
 const AppRouteChildren: AppRouteChildren = {
@@ -179,6 +219,8 @@ const AppRouteChildren: AppRouteChildren = {
   AppAuditsNewRoute: AppAuditsNewRoute,
   AppAuditsIndexRoute: AppAuditsIndexRoute,
   AppAuditsIdEditRoute: AppAuditsIdEditRoute,
+  AppAuditsIdRunRoute: AppAuditsIdRunRoute,
+  AppAuditsRecordIdRoute: AppAuditsRecordIdRoute,
 }
 
 const AppRouteWithChildren = AppRoute._addFileChildren(AppRouteChildren)
