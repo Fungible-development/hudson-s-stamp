@@ -11,7 +11,6 @@ type NavItem = { to: string; label: string; icon: typeof LayoutDashboard };
 
 const adminNav: NavItem[] = [
   { to: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
-  { to: "/templates", label: "Templates", icon: FileText },
   { to: "/audits", label: "Audits", icon: ClipboardCheck },
 ];
 const managerNav: NavItem[] = [{ to: "/manager", label: "Home", icon: LayoutDashboard }];
