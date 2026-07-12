@@ -1,6 +1,6 @@
 import { createFileRoute, Link, Outlet, useRouterState } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { ClipboardCheck, LayoutDashboard, MapPin } from "lucide-react";
+import { ClipboardCheck, LayoutDashboard, MapPin, Settings as SettingsIcon } from "lucide-react";
 import { useActiveRole, useStore } from "@/lib/store";
 
 export const Route = createFileRoute("/_app")({
@@ -85,14 +85,17 @@ function TopBar() {
   const locations = useStore((s) => s.locations);
   const devRole = useStore((s) => s.devRole);
   const setDevRole = useStore((s) => s.setDevRole);
+  const settings = useStore((s) => s.settings);
   const role = useActiveRole();
 
   return (
     <header className="sticky top-0 z-40 flex h-14 items-center gap-3 border-b border-border bg-ink px-3 text-paper sm:px-5">
       <Link to="/dashboard" className="font-display flex items-center gap-2 text-lg font-bold uppercase tracking-wider">
-        <span className="grid h-7 w-7 shrink-0 place-items-center rounded-sm bg-paper text-ink">H</span>
-        <span className="hidden sm:inline">Hudson&apos;s Compliance</span>
-        <span className="sm:hidden">Hudson&apos;s</span>
+        <span className="grid h-7 w-7 shrink-0 place-items-center rounded-sm bg-paper text-ink">
+          {settings.brandMark.slice(0, 1) || "H"}
+        </span>
+        <span className="hidden truncate sm:inline">{settings.groupName}</span>
+        <span className="truncate sm:hidden">{settings.groupName.split(" ")[0]}</span>
       </Link>
 
       <div className="ml-auto flex min-w-0 items-center gap-2">
@@ -112,6 +115,16 @@ function TopBar() {
               ))}
             </select>
           </label>
+        )}
+        {role === "admin" && (
+          <Link
+            to="/settings"
+            title="Settings"
+            aria-label="Settings"
+            className="grid h-8 w-8 shrink-0 place-items-center rounded-sm border border-paper/20 text-paper/80 hover:bg-paper/10 hover:text-paper"
+          >
+            <SettingsIcon className="h-4 w-4" />
+          </Link>
         )}
         <button
           onClick={() => setDevRole(role === "admin" ? "manager" : "admin")}
