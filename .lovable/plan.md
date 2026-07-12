@@ -1,56 +1,64 @@
-## Goals
+## Settings tab — plan
 
-1. Fold "Templates" into "Audits" so admins have one place to create, rename, edit, duplicate, delete, and run audit definitions.
-2. Let the person running an audit choose which assigned location they're auditing at (instead of silently defaulting to the first one).
-3. Bump the persistence key so everyone picks up the current 4-audit seed.
+### Access
+- Add a **gear icon** in the top bar (`src/routes/_app.tsx`), admin-only, next to the location switcher. Opens `/settings`.
+- No change to bottom tab bar / sidebar nav.
 
-## Changes
+### Route
+- New file: `src/routes/_app.settings.tsx` (single page with two sections stacked; no sub-routes needed for v1).
 
-### 1. One place for audit management ("Audits")
+### Section 1 — Locations
+Admin can manage the list of restaurants used everywhere (top-bar switcher, audit assignment, location picker on Start).
 
-Rework the Admin nav from **Dashboard / Templates / Audits** to **Dashboard / Audits**. All template CRUD moves under `/audits`.
+Per location, editable fields:
+- **Display name** (e.g. "Hudson's Camden")
+- **Physical address** (single multi-line field)
 
-Route restructure (rename existing files, keep the components/logic):
+Actions:
+- Add new location (name + address; new `id` generated).
+- Edit inline (row expands to form).
+- Delete (confirm dialog). Guard: if the location is referenced by any template's `locationIds` or by any audit, the delete confirm warns and, on confirm, also strips the id from those templates. Existing audit records keep the id (historical truth) and fall back to "Unknown location" in the UI.
 
-```text
-/audits                    Definitions list + "New audit" button  (was /templates)
-                             Each row: name, schedule, sections/items count,
-                             assigned locations, actions (Run, Edit, Duplicate, Delete)
-                             Below: "Recent audits" list with Recent / Flagged / Off-site tabs
-                             (merges the old Templates list and Audits history into one screen)
-/audits/new                Create audit definition                (was /templates/new)
-/audits/$id/edit           Edit audit definition                  (was /templates/$id)
-/audits/$id/run            Run an audit                           (was /audits/run/$id)
-/audits/record/$id         View a submitted audit record          (was /audits/$id)
-```
+Data-model change (`src/lib/mock/types.ts`):
+- Add `address: string` to `Location`.
+- Keep existing `lat`, `lng`, `radiusM` (untouched by this UI, still used by soft GPS check against seed coordinates).
 
-Copy changes: "Template" → "Audit" everywhere user-facing (headers, buttons, empty states, page titles). Internally the data model keeps `Template` / `templateId` — no store/type churn.
+Store (`src/lib/store.ts`):
+- Add `createLocation`, `updateLocation`, `deleteLocation` actions.
+- On delete, also purge the id from every template's `locationIds`.
+- Seed (`src/lib/mock/seed.ts`): add an `address` string to each existing seeded location.
 
-Remove `/templates` routes and the Templates entry from sidebar + bottom tab bar. Dashboard tiles/links that pointed at `/templates` re-point at `/audits`.
+### Section 2 — Brand & display
+Small, focused settings that change what the whole app shows:
+- **Group name** — string shown in the top bar (currently hard-coded "Hudson's Compliance"). Default kept as today.
+- **Brand mark** — single letter for the square badge in the top bar (default "H").
+- **Date format** — radio: `UK (DD/MM/YYYY)` (default) or `US (MM/DD/YYYY)`. Wired into `src/components/client-date.tsx` so every rendered date respects it.
 
-### 2. Location picker when starting an audit
+Store additions:
+- `settings: { groupName: string; brandMark: string; dateFormat: "uk" | "us" }` with an `updateSettings(patch)` action. Persisted via the existing Zustand persist config (key stays `hudsons-compliance-v2` — new fields default in cleanly).
 
-Replace the current "Start" link (which pre-filled the first location in the query string) with a two-step start:
+### UI details
+- Page header: "Settings" in the display font, matching Dashboard/Audits.
+- Two card blocks: **Locations** (list + Add button) and **Brand & display** (form).
+- Save-on-blur for inline edits; explicit "Save" button on Brand & display.
+- Toast confirmations on create / update / delete (using existing sonner setup if present, else inline success flash).
 
-- On `/audits`, the Run action opens a small dialog: "Where are you auditing?" with a radio/select of **only** the locations that audit is assigned to. If exactly one location is assigned, skip the dialog and go straight in.
-- Confirming navigates to `/audits/$id/run?location=<chosen>`.
-- Inside the runner, if `?location` is missing or not in the audit's `locationIds`, show an inline picker instead of the checklist and only start the audit (and GPS check) after the user picks.
+### Files touched
+- `src/routes/_app.tsx` — gear icon + admin-only link.
+- `src/routes/_app.settings.tsx` — new page.
+- `src/lib/mock/types.ts` — `address` on Location; `AppSettings` type.
+- `src/lib/mock/seed.ts` — addresses for seeded locations; default settings.
+- `src/lib/store.ts` — location CRUD, settings state + action, delete-cascade to templates.
+- `src/components/client-date.tsx` — honor `dateFormat` setting.
+- `src/routes/_app.tsx` (top bar) — use `settings.groupName` and `settings.brandMark`.
 
-Also add the same picker to the Dashboard "Due today" tiles and any other "Start" entry point so no path silently defaults.
+### Out of scope (called out for clarity)
+- Editing GPS coordinates / geofence radius from the UI — the soft GPS check keeps using the seeded coordinates. Easy to add later once real venues are onboarded.
+- GPS strictness toggle, seed-reset button — you deferred these.
 
-### 3. Fresh seed for everyone
-
-- Update seed data to the four audits requested:
-  - **GM Monday Audit** — weekly (keep current checklist)
-  - **Chef Audit** — monthly (keep current checklist)
-  - **Maintenance / Equipment Audit** — monthly (keep current checklist)
-  - **Waitress Training Audit** — as_needed (keep current checklist)
-  (These match what's already seeded; no content changes needed beyond confirming schedules.)
-- Bump the Zustand persist key from `hudsons-compliance-v1` to `hudsons-compliance-v2` so every existing browser drops its stale cache and re-seeds. Old key is not migrated — it's demo data.
-- Keep the two seeded historical audit records so the Dashboard "recent flagged" tile still has something to show.
-
-## Out of scope
-
-- No changes to the data model (`Template`, `Audit`, responses, GPS logic).
-- No changes to the Manager placeholder, stamp UI, or GPS/off-site behavior.
-- No new roles, no real backend — still local mock store.
+### Other settings worth considering later (not building now)
+- **Team / users** — invite managers, assign them to locations (needs real auth).
+- **Notification rules** — who gets pinged when an audit is flagged or missed.
+- **Audit reminder times** — when "due today" starts nagging.
+- **Data export** — CSV of audits for a date range.
+- **Retention** — auto-archive audits older than N months.
