@@ -175,8 +175,8 @@ export const useStore = create<State & Actions>()(
           ...p,
           settings: { ...current.settings, ...(p.settings ?? {}) },
           locations: (p.locations ?? current.locations).map((l) => ({
-            address: "",
             ...l,
+            address: l.address ?? "",
           })),
         };
       },
