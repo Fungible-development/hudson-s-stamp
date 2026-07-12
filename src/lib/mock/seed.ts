@@ -1,10 +1,37 @@
-import type { Audit, Location, Template } from "./types";
+import type { Audit, AppSettings, Location, Template } from "./types";
 
 export const seedLocations: Location[] = [
-  { id: "loc-gardens", name: "Gardens", lat: -33.9308, lng: 18.4155, radiusM: 150 },
-  { id: "loc-campsbay", name: "Camps Bay", lat: -33.95, lng: 18.3776, radiusM: 150 },
-  { id: "loc-vawaterfront", name: "V&A Waterfront", lat: -33.9036, lng: 18.4207, radiusM: 200 },
+  {
+    id: "loc-gardens",
+    name: "Gardens",
+    address: "56 Kloof Street, Gardens, Cape Town 8001",
+    lat: -33.9308,
+    lng: 18.4155,
+    radiusM: 150,
+  },
+  {
+    id: "loc-campsbay",
+    name: "Camps Bay",
+    address: "Victoria Road, Camps Bay, Cape Town 8005",
+    lat: -33.95,
+    lng: 18.3776,
+    radiusM: 150,
+  },
+  {
+    id: "loc-vawaterfront",
+    name: "V&A Waterfront",
+    address: "Shop 6144, Victoria Wharf, V&A Waterfront, Cape Town 8001",
+    lat: -33.9036,
+    lng: 18.4207,
+    radiusM: 200,
+  },
 ];
+
+export const defaultSettings: AppSettings = {
+  groupName: "Hudson's Compliance",
+  brandMark: "H",
+  dateFormat: "uk",
+};
 
 // Fixed timestamps so SSR and client-persisted state match.
 const CREATED = "2026-06-01T08:00:00.000Z";
