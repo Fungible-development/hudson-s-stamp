@@ -1,4 +1,4 @@
-import type { Audit, AppSettings, Location, Template } from "./types";
+import type { Audit, Location, Template } from "./types";
 
 export const seedLocations: Location[] = [
   {
@@ -26,12 +26,6 @@ export const seedLocations: Location[] = [
     radiusM: 200,
   },
 ];
-
-export const defaultSettings: AppSettings = {
-  groupName: "Hudson's Compliance",
-  brandMark: "H",
-  dateFormat: "uk",
-};
 
 // Fixed timestamps so SSR and client-persisted state match.
 const CREATED = "2026-06-01T08:00:00.000Z";
