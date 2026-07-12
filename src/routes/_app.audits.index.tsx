@@ -1,6 +1,6 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { useState } from "react";
-import { Copy, MapPinOff, Pencil, Play, Plus, Trash2 } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
+import { Copy, MapPinOff, MoreVertical, Pencil, Plus, Trash2 } from "lucide-react";
 import { useStore, useVisibleAudits, useVisibleTemplates } from "@/lib/store";
 import { ClientDate } from "@/components/client-date";
 import type { Schedule, Template } from "@/lib/mock/types";
@@ -110,27 +110,17 @@ function AuditsIndex() {
                   <div className="col-span-2 flex shrink-0 items-center gap-1 sm:col-auto">
                     <button
                       onClick={() => startAudit(t)}
-                      className="flex items-center gap-1.5 rounded-lg bg-ink px-3 py-2 text-[13px] font-medium text-paper"
+                      className="rounded-lg bg-ink px-3.5 py-2 text-[13px] font-medium text-paper"
                     >
-                      <Play className="h-3.5 w-3.5" /> Run
+                      Start
                     </button>
-                    <IconBtn
-                      title="Edit"
-                      onClick={() => navigate({ to: "/audits/$id/edit", params: { id: t.id } })}
-                    >
-                      <Pencil className="h-4 w-4" />
-                    </IconBtn>
-                    <IconBtn title="Duplicate" onClick={() => duplicate(t.id)}>
-                      <Copy className="h-4 w-4" />
-                    </IconBtn>
-                    <IconBtn
-                      title="Delete"
-                      onClick={() => {
+                    <RowMenu
+                      onEdit={() => navigate({ to: "/audits/$id/edit", params: { id: t.id } })}
+                      onDuplicate={() => duplicate(t.id)}
+                      onDelete={() => {
                         if (confirm(`Delete "${t.name}"?`)) del(t.id);
                       }}
-                    >
-                      <Trash2 className="h-4 w-4 text-fail" />
-                    </IconBtn>
+                    />
                   </div>
                 </li>
               );
@@ -218,23 +208,73 @@ function AuditsIndex() {
   );
 }
 
-function IconBtn({
-  children,
-  onClick,
-  title,
+function RowMenu({
+  onEdit,
+  onDuplicate,
+  onDelete,
 }: {
-  children: React.ReactNode;
-  onClick: () => void;
-  title: string;
+  onEdit: () => void;
+  onDuplicate: () => void;
+  onDelete: () => void;
 }) {
+  const [open, setOpen] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!open) return;
+    const onDoc = (e: MouseEvent) => {
+      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
+    };
+    document.addEventListener("mousedown", onDoc);
+    return () => document.removeEventListener("mousedown", onDoc);
+  }, [open]);
+
+  const item =
+    "flex w-full items-center gap-2 px-3 py-2 text-left text-[13px] hover:bg-muted";
+
   return (
-    <button
-      onClick={onClick}
-      title={title}
-      className="grid h-9 w-9 place-items-center rounded-sm border border-border bg-background hover:bg-muted"
-    >
-      {children}
-    </button>
+    <div ref={ref} className="relative">
+      <button
+        type="button"
+        onClick={() => setOpen((v) => !v)}
+        title="More"
+        aria-label="More actions"
+        className="grid h-9 w-9 place-items-center rounded-sm border border-border bg-background hover:bg-muted"
+      >
+        <MoreVertical className="h-4 w-4" />
+      </button>
+      {open && (
+        <div className="absolute right-0 z-20 mt-1 w-40 overflow-hidden rounded-lg border border-border bg-card shadow-md">
+          <button
+            className={item}
+            onClick={() => {
+              setOpen(false);
+              onEdit();
+            }}
+          >
+            <Pencil className="h-4 w-4" /> Edit
+          </button>
+          <button
+            className={item}
+            onClick={() => {
+              setOpen(false);
+              onDuplicate();
+            }}
+          >
+            <Copy className="h-4 w-4" /> Duplicate
+          </button>
+          <button
+            className={`${item} text-fail`}
+            onClick={() => {
+              setOpen(false);
+              onDelete();
+            }}
+          >
+            <Trash2 className="h-4 w-4" /> Delete
+          </button>
+        </div>
+      )}
+    </div>
   );
 }
 
